@@ -19,7 +19,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.util.ArrayMap;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -36,17 +35,11 @@ import com.android.launcher3.Insettable;
 import com.android.launcher3.Launcher;
 import com.android.launcher3.R;
 import com.android.launcher3.anim.PropertySetter;
-import com.android.launcher3.uioverrides.plugins.PluginManagerWrapper;
-import com.android.systemui.plugins.AllAppsRow;
-import com.android.systemui.plugins.AllAppsRow.OnHeightUpdatedListener;
-import com.android.systemui.plugins.PluginListener;
 
 import java.util.ArrayList;
-import java.util.Map;
 
 public class FloatingHeaderView extends LinearLayout implements
-        ValueAnimator.AnimatorUpdateListener, PluginListener<AllAppsRow>, Insettable,
-        OnHeightUpdatedListener {
+        ValueAnimator.AnimatorUpdateListener, Insettable {
 
     private final Rect mClip = new Rect(0, 0, Integer.MAX_VALUE, Integer.MAX_VALUE);
     private final ValueAnimator mAnimator = ValueAnimator.ofInt(0, 0);
@@ -73,8 +66,6 @@ public class FloatingHeaderView extends LinearLayout implements
     };
 
     private final int mHeaderTopPadding;
-
-    protected final Map<AllAppsRow, PluginHeaderRow> mPluginRows = new ArrayMap<>();
 
     protected ViewGroup mTabLayout;
     private AllAppsRecyclerView mMainRV;
@@ -130,47 +121,6 @@ public class FloatingHeaderView extends LinearLayout implements
         mAllRows = mFixedRows;
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        PluginManagerWrapper.INSTANCE.get(getContext()).addPluginListener(this,
-                AllAppsRow.class, true /* allowMultiple */);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        PluginManagerWrapper.INSTANCE.get(getContext()).removePluginListener(this);
-    }
-
-    private void recreateAllRowsArray() {
-        int pluginCount = mPluginRows.size();
-        if (pluginCount == 0) {
-            mAllRows = mFixedRows;
-        } else {
-            int count = mFixedRows.length;
-            mAllRows = new FloatingHeaderRow[count + pluginCount];
-            for (int i = 0; i < count; i++) {
-                mAllRows[i] = mFixedRows[i];
-            }
-
-            for (PluginHeaderRow row : mPluginRows.values()) {
-                mAllRows[count] = row;
-                count++;
-            }
-        }
-    }
-
-    @Override
-    public void onPluginConnected(AllAppsRow allAppsRowPlugin, Context context) {
-        PluginHeaderRow headerRow = new PluginHeaderRow(allAppsRowPlugin, this);
-        addView(headerRow.mView, indexOfChild(mTabLayout));
-        mPluginRows.put(allAppsRowPlugin, headerRow);
-        recreateAllRowsArray();
-        allAppsRowPlugin.setOnHeightUpdatedListener(this);
-    }
-
-    @Override
     public void onHeightUpdated() {
         int oldMaxHeight = mMaxTranslation;
         updateExpectedHeight();
@@ -181,15 +131,6 @@ public class FloatingHeaderView extends LinearLayout implements
                 parent.setupHeader();
             }
         }
-    }
-
-    @Override
-    public void onPluginDisconnected(AllAppsRow plugin) {
-        PluginHeaderRow row = mPluginRows.get(plugin);
-        removeView(row.mView);
-        mPluginRows.remove(plugin);
-        recreateAllRowsArray();
-        onHeightUpdated();
     }
 
     public void setup(AllAppsContainerView.AdapterHolder[] mAH, boolean tabsHidden) {
@@ -208,7 +149,7 @@ public class FloatingHeaderView extends LinearLayout implements
     }
 
     private AllAppsRecyclerView setupRV(AllAppsRecyclerView old, AllAppsRecyclerView updated) {
-        if (old != updated && updated != null ) {
+        if (old != updated && updated != null) {
             updated.addOnScrollListener(mOnScrollListener);
         }
         return updated;
@@ -298,7 +239,6 @@ public class FloatingHeaderView extends LinearLayout implements
         if (mCollapsed == collapse) return;
 
         mCollapsed = collapse;
-        onHeightUpdated();
     }
 
     public void reset(boolean animate) {
@@ -364,7 +304,7 @@ public class FloatingHeaderView extends LinearLayout implements
     }
 
     public void setContentVisibility(boolean hasHeader, boolean hasAllAppsContent,
-            PropertySetter setter, Interpolator headerFade, Interpolator allAppsFade) {
+                                     PropertySetter setter, Interpolator headerFade, Interpolator allAppsFade) {
         for (FloatingHeaderRow row : mAllRows) {
             row.setContentVisibility(hasHeader, hasAllAppsContent, setter, headerFade, allAppsFade);
         }

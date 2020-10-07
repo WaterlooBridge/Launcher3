@@ -15,16 +15,6 @@
  */
 package com.android.quickstep.views;
 
-import static com.android.launcher3.LauncherState.ALL_APPS;
-import static com.android.launcher3.LauncherState.ALL_APPS_HEADER_EXTRA;
-import static com.android.launcher3.LauncherState.NORMAL;
-import static com.android.launcher3.LauncherState.OVERVIEW;
-import static com.android.launcher3.LauncherState.RECENTS_CLEAR_ALL_BUTTON;
-import static com.android.launcher3.LauncherState.SPRING_LOADED;
-import static com.android.launcher3.QuickstepAppTransitionManagerImpl.ALL_APPS_PROGRESS_OFF_SCREEN;
-import static com.android.launcher3.allapps.AllAppsTransitionController.ALL_APPS_PROGRESS;
-import static com.android.launcher3.config.FeatureFlags.ENABLE_QUICKSTEP_LIVE_TILE;
-
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
@@ -46,14 +36,21 @@ import com.android.launcher3.R;
 import com.android.launcher3.anim.Interpolators;
 import com.android.launcher3.appprediction.PredictionUiStateManager;
 import com.android.launcher3.appprediction.PredictionUiStateManager.Client;
-import com.android.launcher3.uioverrides.plugins.PluginManagerWrapper;
 import com.android.launcher3.views.ScrimView;
 import com.android.quickstep.SysUINavigationMode;
 import com.android.quickstep.util.ClipAnimationHelper;
 import com.android.quickstep.util.ClipAnimationHelper.TransformParams;
 import com.android.quickstep.util.LayoutUtils;
-import com.android.systemui.plugins.PluginListener;
-import com.android.systemui.plugins.RecentsExtraCard;
+
+import static com.android.launcher3.LauncherState.ALL_APPS;
+import static com.android.launcher3.LauncherState.ALL_APPS_HEADER_EXTRA;
+import static com.android.launcher3.LauncherState.NORMAL;
+import static com.android.launcher3.LauncherState.OVERVIEW;
+import static com.android.launcher3.LauncherState.RECENTS_CLEAR_ALL_BUTTON;
+import static com.android.launcher3.LauncherState.SPRING_LOADED;
+import static com.android.launcher3.QuickstepAppTransitionManagerImpl.ALL_APPS_PROGRESS_OFF_SCREEN;
+import static com.android.launcher3.allapps.AllAppsTransitionController.ALL_APPS_PROGRESS;
+import static com.android.launcher3.config.FeatureFlags.ENABLE_QUICKSTEP_LIVE_TILE;
 
 /**
  * {@link RecentsView} used in Launcher activity
@@ -65,24 +62,7 @@ public class LauncherRecentsView extends RecentsView<Launcher> implements StateL
 
     private final TransformParams mTransformParams = new TransformParams();
 
-    private RecentsExtraCard mRecentsExtraCardPlugin;
     private RecentsExtraViewContainer mRecentsExtraViewContainer;
-    private PluginListener<RecentsExtraCard> mRecentsExtraCardPluginListener =
-            new PluginListener<RecentsExtraCard>() {
-        @Override
-        public void onPluginConnected(RecentsExtraCard recentsExtraCard, Context context) {
-            createRecentsExtraCard();
-            mRecentsExtraCardPlugin = recentsExtraCard;
-            mRecentsExtraCardPlugin.setupView(context, mRecentsExtraViewContainer, mActivity);
-        }
-
-        @Override
-        public void onPluginDisconnected(RecentsExtraCard plugin) {
-            removeView(mRecentsExtraViewContainer);
-            mRecentsExtraCardPlugin = null;
-            mRecentsExtraViewContainer = null;
-        }
-    };
 
     public LauncherRecentsView(Context context) {
         this(context, null);
@@ -310,20 +290,6 @@ public class LauncherRecentsView extends RecentsView<Launcher> implements StateL
     }
 
     @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-        PluginManagerWrapper.INSTANCE.get(getContext())
-                .addPluginListener(mRecentsExtraCardPluginListener, RecentsExtraCard.class);
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        PluginManagerWrapper.INSTANCE.get(getContext()).removePluginListener(
-                mRecentsExtraCardPluginListener);
-    }
-
-    @Override
     protected int computeMinScrollX() {
         if (canComputeScrollX() && !mIsRtl) {
             return computeScrollX();
@@ -340,8 +306,7 @@ public class LauncherRecentsView extends RecentsView<Launcher> implements StateL
     }
 
     private boolean canComputeScrollX() {
-        return mRecentsExtraCardPlugin != null && getTaskViewCount() > 0
-                && !mDisallowScrollToClearAll;
+        return getTaskViewCount() > 0 && !mDisallowScrollToClearAll;
     }
 
     private int computeScrollX() {
