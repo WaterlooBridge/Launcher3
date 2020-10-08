@@ -25,6 +25,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.android.launcher3.accessibility.LauncherAccessibilityDelegate;
+import com.android.launcher3.config.FeatureFlags;
 import com.android.launcher3.dragndrop.DragOptions;
 import com.android.launcher3.logging.LoggerUtils;
 import com.android.launcher3.model.ModelWriter;
@@ -81,7 +82,11 @@ public class DeleteDropTarget extends ButtonDropTarget {
 
     @Override
     protected boolean supportsDrop(ItemInfo info) {
-        return true;
+        return supportsDropCompat(info);
+    }
+
+    private boolean supportsDropCompat(ItemInfo info) {
+        return FeatureFlags.PULL_UP_ALL_APPS || LauncherSettings.Favorites.ITEM_TYPE_APPLICATION != info.itemType;
     }
 
     /**

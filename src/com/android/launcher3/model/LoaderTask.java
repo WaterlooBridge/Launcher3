@@ -39,6 +39,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.MutableInt;
+import android.util.Pair;
 
 import com.android.launcher3.AppInfo;
 import com.android.launcher3.FolderInfo;
@@ -81,6 +82,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
@@ -220,6 +222,14 @@ public class LoaderTask implements Runnable {
             waitForIdle();
             verifyNotStopped();
 
+            List<Pair<ItemInfo, Object>> allAppsAsShortcuts = null;
+            if (!FeatureFlags.PULL_UP_ALL_APPS) {
+                allAppsAsShortcuts = loadAllAppsAsShortcuts();
+
+                waitForIdle();
+                verifyNotStopped();
+            }
+
             // fourth step
             TraceHelper.partitionSection(TAG, "step 4.1: loading widgets");
             List<ComponentWithLabel> allWidgetsList = mBgDataModel.widgetsModel.update(mApp, null);
@@ -239,6 +249,8 @@ public class LoaderTask implements Runnable {
             updateHandler.finish();
 
             transaction.commit();
+
+            bindAllAppsAsShortcuts(allAppsAsShortcuts);
         } catch (CancellationException e) {
             // Loader stopped, ignore
             TraceHelper.partitionSection(TAG, "Cancelled");
@@ -864,6 +876,66 @@ public class LoaderTask implements Runnable {
                 }
             }
         }
+    }
+
+    private List<Pair<ItemInfo, Object>> loadAllAppsAsShortcuts() {
+        List<Pair<ItemInfo, Object>> added = new ArrayList<>();
+        for (AppInfo app : mBgAllAppsList.data) {
+            if (!checkAppInfoAsShortcutIsAdded(app)) {
+                // We are missing an application icon, so add this to the workspace
+                added.add(Pair.create(app, null));
+                // This is a rare event, so lets log it
+                Log.d(TAG, "Missing Application on load: " + app);
+            }
+        }
+        Log.d(TAG, "added list after sort: " + added);
+        return added;
+    }
+
+    private boolean checkAppInfoAsShortcutIsAdded(AppInfo app) {
+        Iterator<ItemInfo> iterator = mBgDataModel.itemsIdMap.iterator();
+        ItemInfo tempItem;
+        while (iterator.hasNext()) {
+            tempItem = iterator.next();
+            if (tempItem instanceof WorkspaceItemInfo) {
+                if (equalsItemInfo(app, tempItem.user, tempItem.getTargetComponent())) {
+                    return true;
+                }
+            } else if (tempItem instanceof FolderInfo) {
+                FolderInfo info = (FolderInfo) tempItem;
+                for (WorkspaceItemInfo s : info.contents) {
+                    if (equalsItemInfo(app, s.user, s.getTargetComponent())) {
+                        return true;
+                    }
+                }
+            } else if (tempItem instanceof LauncherAppWidgetInfo) {
+                LauncherAppWidgetInfo info = (LauncherAppWidgetInfo) tempItem;
+                if (equalsItemInfo(app, info.user, info.providerName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean equalsItemInfo(ItemInfo itemInfo1, UserHandle user2, ComponentName cn2) {
+        UserHandle user1 = itemInfo1.user;
+        ComponentName cn1 = itemInfo1.getTargetComponent();
+        if (null != user1) {
+            if (null != user2) {
+                return null != cn1 && user1.equals(user2) && cn1.equals(cn2);
+            } else {
+                return null != cn1 && cn1.equals(cn2);
+            }
+        } else {
+            return null != cn1 && cn1.equals(cn2);
+        }
+    }
+
+    private void bindAllAppsAsShortcuts(List<Pair<ItemInfo, Object>> allAppsAsShortcuts) {
+        if (allAppsAsShortcuts == null)
+            return;
+        mResults.mUiExecutor.execute(() -> mApp.getModel().addAndBindAddedWorkspaceItems(allAppsAsShortcuts));
     }
 
     public static boolean isValidProvider(AppWidgetProviderInfo provider) {

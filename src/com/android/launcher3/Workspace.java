@@ -23,6 +23,7 @@ import static com.android.launcher3.LauncherSettings.Favorites.ITEM_TYPE_APPLICA
 import static com.android.launcher3.LauncherState.ALL_APPS;
 import static com.android.launcher3.LauncherState.NORMAL;
 import static com.android.launcher3.LauncherState.SPRING_LOADED;
+import static com.android.launcher3.config.BaseFlags.PULL_UP_ALL_APPS;
 import static com.android.launcher3.config.FeatureFlags.ADAPTIVE_ICON_WINDOW_ANIM;
 import static com.android.launcher3.dragndrop.DragLayer.ALPHA_INDEX_OVERLAY;
 
@@ -3409,6 +3410,8 @@ public class Workspace extends PagedView<WorkspacePageIndicator>
         @Override
         public void onAnimationEnd(Animator animation) {
             onEndStateTransition();
+            if (!PULL_UP_ALL_APPS && mToState == ALL_APPS)
+                mLauncher.getStateManager().goToState(NORMAL, SPRING_LOADED_EXIT_DELAY);
         }
     }
 }
