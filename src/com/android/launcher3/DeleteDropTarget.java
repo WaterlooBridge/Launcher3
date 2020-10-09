@@ -86,7 +86,8 @@ public class DeleteDropTarget extends ButtonDropTarget {
     }
 
     private boolean supportsDropCompat(ItemInfo info) {
-        return FeatureFlags.PULL_UP_ALL_APPS || LauncherSettings.Favorites.ITEM_TYPE_APPLICATION != info.itemType;
+        return FeatureFlags.PULL_UP_ALL_APPS || (LauncherSettings.Favorites.ITEM_TYPE_APPLICATION != info.itemType
+                && LauncherSettings.Favorites.ITEM_TYPE_FOLDER != info.itemType);
     }
 
     /**
