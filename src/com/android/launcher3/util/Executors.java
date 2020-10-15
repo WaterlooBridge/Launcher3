@@ -84,4 +84,10 @@ public class Executors {
      */
     public static final LooperExecutor MODEL_EXECUTOR =
             new LooperExecutor(createAndStartNewLooper("launcher-loader"));
+
+    /**
+     * Executor used for load icon packs.
+     */
+    public static final LooperExecutor ICON_PACK_EXECUTOR =
+            new LooperExecutor(createAndStartNewLooper("launcher-icon-pack"));
 }

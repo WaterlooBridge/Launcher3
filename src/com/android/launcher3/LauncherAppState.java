@@ -171,6 +171,12 @@ public class LauncherAppState {
         return mInvariantDeviceProfile;
     }
 
+    public void reloadIconCache() {
+        mIconCache.removeAllIcons();
+        mModel.forceReload();
+    }
+
+
     /**
      * Shorthand for {@link #getInvariantDeviceProfile()}
      */

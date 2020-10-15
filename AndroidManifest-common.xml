@@ -179,6 +179,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Apply directly from iconpack -->
+        <activity
+            android:name="com.zhenl.launcher.iconpack.ApplyIconPackActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="com.zhenl.launcher.APPLY_ICONS" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <provider
             android:name="com.android.launcher3.testing.TestInformationProvider"
             android:authorities="${packageName}.TestInfo"
