@@ -40,6 +40,15 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    signingConfigs {
+        platform {
+            storeFile file('platform.keystore')
+            storePassword "android"
+            keyAlias "platform"
+            keyPassword "android"
+        }
+    }
+
     // The flavor dimensions for build variants (e.g. aospWithQuickstep, aospWithoutQuickstep)
     // See: https://developer.android.com/studio/build/build-variants#flavor-dimensions
     flavorDimensions "app", "recents"
@@ -71,6 +80,12 @@ android {
 
         withoutQuickstep {
             dimension "recents"
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.platform
         }
     }
 
