@@ -24,6 +24,7 @@ import android.content.pm.ShortcutInfo;
 import android.os.Process;
 import android.os.UserHandle;
 import android.util.Log;
+import android.util.Pair;
 
 import com.android.launcher3.InstallShortcutReceiver;
 import com.android.launcher3.ItemInfo;
@@ -101,6 +102,7 @@ public class PackageUpdatedTask extends BaseModelUpdateTask {
         final HashSet<String> packageSet = new HashSet<>(Arrays.asList(packages));
         ItemInfoMatcher matcher = ItemInfoMatcher.ofPackages(packageSet, mUser);
         final HashSet<ComponentName> removedComponents = new HashSet<>();
+        final List<Pair<ItemInfo, Object>> added = new ArrayList<>();
 
         switch (mOp) {
             case OP_ADD: {
@@ -110,7 +112,11 @@ public class PackageUpdatedTask extends BaseModelUpdateTask {
                     if (FeatureFlags.LAUNCHER3_PROMISE_APPS_IN_ALL_APPS) {
                         appsList.removePackage(packages[i], mUser);
                     }
+                    int previousSize = appsList.data.size();
                     appsList.addPackage(context, packages[i], mUser);
+                    int currentSize = appsList.data.size();
+                    if (currentSize > previousSize)
+                        added.add(Pair.create(appsList.data.get(currentSize - 1), null));
 
                     // Automatically add homescreen icon for work profile apps for below O device.
                     if (!Utilities.ATLEAST_OREO && !Process.myUserHandle().equals(mUser)) {
@@ -166,7 +172,10 @@ public class PackageUpdatedTask extends BaseModelUpdateTask {
                 break;
         }
 
-        bindApplicationsIfNeeded();
+        if (FeatureFlags.PULL_UP_ALL_APPS)
+            bindApplicationsIfNeeded();
+        else if (!added.isEmpty())
+            app.getModel().addAndBindAddedWorkspaceItems(added);
 
         final IntSparseArrayMap<Boolean> removedShortcuts = new IntSparseArrayMap<>();
 
