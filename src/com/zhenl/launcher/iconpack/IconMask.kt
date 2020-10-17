@@ -7,7 +7,7 @@ import androidx.core.graphics.drawable.toBitmap
 import com.android.launcher3.FastBitmapDrawable
 import com.android.launcher3.LauncherAppState
 import com.android.launcher3.Utilities
-import com.android.launcher3.icons.FixedScaleDrawable
+import kotlin.math.abs
 
 /**
  * Created by lin on 2020/10/13.
@@ -31,12 +31,13 @@ class IconMask {
         val iconBack = getFromList(validBacks, key)
         val iconMask = getFromList(validMasks, key)
         val iconUpon = getFromList(validUpons, key)
-        val scale = getScale(iconBack)
 
         var adaptiveBackground: Drawable? = null
         // Some random magic to get an acceptable resolution
-        var size = (LauncherAppState.getIDP(context).iconBitmapSize * (3 - scale)).toInt()
+        var size = LauncherAppState.getIDP(context).iconBitmapSize
         if (Utilities.ATLEAST_OREO && iconBack?.drawableId != 0 && iconBack?.drawable is AdaptiveIconCompat) {
+            if (onlyMaskLegacy && baseIcon is AdaptiveIconCompat)
+                return baseIcon
             size += (size * AdaptiveIconCompat.getExtraInsetFraction()).toInt()
         }
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
@@ -44,10 +45,8 @@ class IconMask {
 
         // Draw the app icon
         val iconBitmapSize = LauncherAppState.getIDP(context).iconBitmapSize
-        var bb = baseIcon.toBitmap(iconBitmapSize, iconBitmapSize)
-        if (!bb.isMutable) bb = bb.copy(bb.config, true)
-        matrix.setScale((size * scale) / bb.width, (size * scale) / bb.height)
-        matrix.postTranslate((size / 2) * (1 - scale), (size / 2) * (1 - scale))
+        val bb = baseIcon.toBitmap(iconBitmapSize, iconBitmapSize)
+        matrix.postTranslate((size - bb.width) / 2f, (size - bb.height) / 2f)
         canvas.drawBitmap(bb, matrix, paint)
         matrix.reset()
 
@@ -86,26 +85,13 @@ class IconMask {
                 matrix.reset()
             }
         }
-        if (adaptiveBackground != null) {
-            if (onlyMaskLegacy && baseIcon is AdaptiveIconCompat) {
-                return baseIcon
-            }
-            if(Utilities.ATLEAST_OREO)
+        if (Utilities.ATLEAST_OREO && adaptiveBackground != null)
             return AdaptiveIconCompat(adaptiveBackground, FastBitmapDrawable(bitmap))
-        }
         return FastBitmapDrawable(bitmap)
-    }
-
-    private fun getScale(iconBack: IconPackImpl.Entry?): Float {
-        return if (Utilities.ATLEAST_OREO && iconBack?.drawable is AdaptiveIconCompat) {
-            iconScale - (1f - FixedScaleDrawable.LEGACY_ICON_SCALE)
-        } else {
-            iconScale
-        }
     }
 
     private fun <T> getFromList(list: List<T>, key: Any?): T? {
         if (list.isEmpty()) return null
-        return list[Math.abs(key.hashCode()) % list.size]
+        return list[abs(key.hashCode()) % list.size]
     }
 }
