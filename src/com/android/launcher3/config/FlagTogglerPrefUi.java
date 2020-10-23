@@ -25,12 +25,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.android.launcher3.R;
-
 import androidx.preference.PreferenceDataStore;
-import androidx.preference.PreferenceFragment;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroup;
 import androidx.preference.SwitchPreference;
+
+import com.android.launcher3.R;
 import com.android.launcher3.config.BaseFlags.BaseTogglableFlag;
 import com.android.launcher3.uioverrides.TogglableFlag;
 
@@ -41,7 +41,7 @@ public final class FlagTogglerPrefUi {
 
     private static final String TAG = "FlagTogglerPrefFrag";
 
-    private final PreferenceFragment mFragment;
+    private final PreferenceFragmentCompat mFragment;
     private final Context mContext;
     private final SharedPreferences mSharedPreferences;
 
@@ -72,7 +72,7 @@ public final class FlagTogglerPrefUi {
         }
     };
 
-    public FlagTogglerPrefUi(PreferenceFragment fragment) {
+    public FlagTogglerPrefUi(PreferenceFragmentCompat fragment) {
         mFragment = fragment;
         mContext = fragment.getActivity();
         mSharedPreferences = mContext.getSharedPreferences(

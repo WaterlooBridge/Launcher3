@@ -25,7 +25,7 @@ import android.view.MenuItem;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
-import androidx.preference.PreferenceFragment;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
 
 import com.android.launcher3.config.FeatureFlags;
@@ -36,7 +36,7 @@ import com.android.launcher3.config.FlagTogglerPrefUi;
  * See {@link FeatureFlags}.
  */
 @TargetApi(Build.VERSION_CODES.O)
-public class DeveloperOptionsFragment extends PreferenceFragment {
+public class DeveloperOptionsFragment extends PreferenceFragmentCompat {
 
     private static final String ACTION_PLUGIN_SETTINGS = "com.android.systemui.action.PLUGIN_SETTINGS";
     private static final String PLUGIN_PERMISSION = "com.android.systemui.permission.PLUGIN";

@@ -16,9 +16,6 @@
 
 package com.android.launcher3.settings;
 
-import android.app.Activity;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -28,10 +25,11 @@ import android.provider.Settings;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 import androidx.preference.Preference;
-import androidx.preference.PreferenceFragment;
-import androidx.preference.PreferenceFragment.OnPreferenceStartFragmentCallback;
-import androidx.preference.PreferenceFragment.OnPreferenceStartScreenCallback;
+import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceGroup.PreferencePositionCallback;
 import androidx.preference.PreferenceScreen;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,8 +50,8 @@ import static com.android.launcher3.util.SecureSettingsObserver.newNotificationS
 /**
  * Settings activity for Launcher. Currently implements the following setting: Allow rotation
  */
-public class SettingsActivity extends Activity
-        implements OnPreferenceStartFragmentCallback, OnPreferenceStartScreenCallback,
+public class SettingsActivity extends AppCompatActivity
+        implements PreferenceFragmentCompat.OnPreferenceStartFragmentCallback, PreferenceFragmentCompat.OnPreferenceStartScreenCallback,
         SharedPreferences.OnSharedPreferenceChangeListener{
 
     private static final String DEVELOPER_OPTIONS_KEY = "pref_developer_options";
@@ -84,7 +82,7 @@ public class SettingsActivity extends Activity
             Fragment f = Fragment.instantiate(
                     this, getString(R.string.settings_fragment_name), args);
             // Display the fragment as the main content.
-            getFragmentManager().beginTransaction()
+            getSupportFragmentManager().beginTransaction()
                     .replace(android.R.id.content, f)
                     .commit();
         }
@@ -120,9 +118,9 @@ public class SettingsActivity extends Activity
         }
         Fragment f = Fragment.instantiate(this, fragment, args);
         if (f instanceof DialogFragment) {
-            ((DialogFragment) f).show(getFragmentManager(), key);
+            ((DialogFragment) f).show(getSupportFragmentManager(), key);
         } else {
-            getFragmentManager()
+            getSupportFragmentManager()
                     .beginTransaction()
                     .replace(android.R.id.content, f)
                     .addToBackStack(key)
@@ -132,22 +130,21 @@ public class SettingsActivity extends Activity
     }
 
     @Override
-    public boolean onPreferenceStartFragment(
-            PreferenceFragment preferenceFragment, Preference pref) {
+    public boolean onPreferenceStartFragment(PreferenceFragmentCompat caller, Preference pref) {
         return startFragment(pref.getFragment(), pref.getExtras(), pref.getKey());
     }
 
     @Override
-    public boolean onPreferenceStartScreen(PreferenceFragment caller, PreferenceScreen pref) {
+    public boolean onPreferenceStartScreen(PreferenceFragmentCompat caller, PreferenceScreen pref) {
         Bundle args = new Bundle();
-        args.putString(PreferenceFragment.ARG_PREFERENCE_ROOT, pref.getKey());
+        args.putString(PreferenceFragmentCompat.ARG_PREFERENCE_ROOT, pref.getKey());
         return startFragment(getString(R.string.settings_fragment_name), args, pref.getKey());
     }
 
     /**
      * This fragment shows the launcher preferences.
      */
-    public static class LauncherSettingsFragment extends PreferenceFragment {
+    public static class LauncherSettingsFragment extends PreferenceFragmentCompat {
 
         private SecureSettingsObserver mNotificationDotsObserver;
 

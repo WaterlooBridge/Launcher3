@@ -40,7 +40,11 @@
     <!-- Label for showing custom action list of a shortcut or widget. [CHAR_LIMIT=30] -->
     <string name="custom_actions">Custom actions</string>
 
+    <string name="pref_icon_packs" translatable="false">Icon Packs</string>
     <string name="icon_pack_default" translatable="false">System Icons</string>
+    <string name="drag_to_enable_packs" translatable="false">Drag Up to Enable</string>
+    <string name="drag_to_disable_packs" translatable="false">Drag Down to Disable</string>
+    <string name="enabled_icon_packs" translatable="false">Applied</string>
 
     <!-- Widgets -->
     <!-- Message to tell the user to press and hold on a widget to add it [CHAR_LIMIT=50] -->

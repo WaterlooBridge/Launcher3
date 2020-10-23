@@ -50,6 +50,11 @@
         android:defaultValue="false"
         android:persistent="true" />
 
+    <com.zhenl.launcher.settings.IconPackPreference
+        android:key="pref_icon_packs"
+        android:persistent="true"
+        android:title="@string/pref_icon_packs" />
+
     <androidx.preference.PreferenceScreen
         android:key="pref_developer_options"
         android:persistent="false"

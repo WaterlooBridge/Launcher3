@@ -10,12 +10,16 @@ import android.graphics.drawable.Drawable
 import android.os.Process
 import android.os.UserHandle
 import android.text.TextUtils
+import android.util.Property
+import androidx.annotation.ColorInt
+import androidx.dynamicanimation.animation.FloatPropertyCompat
 import com.android.launcher3.Utilities
 import com.android.launcher3.compat.LauncherAppsCompat
 import com.android.launcher3.compat.UserManagerCompat
 import com.android.launcher3.icons.ColorExtractor.posterize
 import com.android.launcher3.util.ComponentKey
 import org.xmlpull.v1.XmlPullParser
+import kotlin.reflect.KMutableProperty0
 
 
 /**
@@ -24,9 +28,45 @@ import org.xmlpull.v1.XmlPullParser
 
 val Context.launcherPrefs get() = LauncherPreferences.getInstance(this)
 
+@ColorInt
+fun Context.getColorEngineAccent(): Int {
+    return getColorAccent()
+}
+
+@ColorInt
+fun Context.getColorAccent(): Int {
+    return getColorAttr(android.R.attr.colorAccent)
+}
+
+@ColorInt
+fun Context.getColorAttr(attr: Int): Int {
+    val ta = obtainStyledAttributes(intArrayOf(attr))
+    @ColorInt val colorAccent = ta.getColor(0, 0)
+    ta.recycle()
+    return colorAccent
+}
+
 fun ComponentKey.getLauncherActivityInfo(context: Context): LauncherActivityInfo? {
     return LauncherAppsCompat.getInstance(context).getActivityList(componentName.packageName, user)
             .firstOrNull { it.componentName == componentName }
+}
+
+class KFloatPropertyCompat(private val property: KMutableProperty0<Float>, name: String) : FloatPropertyCompat<Any>(name) {
+
+    override fun getValue(`object`: Any) = property.get()
+
+    override fun setValue(`object`: Any, value: Float) {
+        property.set(value)
+    }
+}
+
+class KFloatProperty(private val property: KMutableProperty0<Float>, name: String) : Property<Any, Float>(Float::class.java, name) {
+
+    override fun get(`object`: Any) = property.get()
+
+    override fun set(`object`: Any, value: Float) {
+        property.set(value)
+    }
 }
 
 fun String.asNonEmpty(): String? {

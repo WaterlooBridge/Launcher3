@@ -130,7 +130,7 @@
         <item name="widgetsTheme">@style/WidgetContainerTheme</item>
     </style>
 
-    <style name="HomeSettingsTheme" parent="@android:style/Theme.DeviceDefault.Settings">
+    <style name="HomeSettingsTheme" parent="Theme.AppCompat.DayNight">
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
