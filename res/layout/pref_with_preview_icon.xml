@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:minHeight="?android:attr/listPreferredItemHeightSmall"
     android:paddingStart="?android:attr/listPreferredItemPaddingStart"
     android:paddingEnd="?android:attr/listPreferredItemPaddingEnd">
+
+    <LinearLayout
+        android:id="@+id/icon_frame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start|center_vertical"
+        android:minWidth="56dp"
+        android:orientation="horizontal"
+        android:paddingStart="0dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp">
+
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="0dp"
@@ -35,11 +51,11 @@
             android:textColor="?android:attr/textColorSecondary" />
     </RelativeLayout>
 
-    <com.android.internal.widget.PreferenceImageView
+    <androidx.preference.internal.PreferenceImageView
         android:id="@android:id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:maxWidth="48dp"
-        android:maxHeight="48dp"
-        android:scaleType="fitCenter" />
+        android:scaleType="fitCenter"
+        app:maxHeight="48dp"
+        app:maxWidth="48dp" />
 </LinearLayout>
