@@ -5,10 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.view.MotionEvent
 import android.view.ViewConfiguration
-import com.android.launcher3.Launcher
-import com.android.launcher3.LauncherAppTransitionManagerImpl
-import com.android.launcher3.LauncherState
-import com.android.launcher3.LauncherStateManager
+import com.android.launcher3.*
 import com.android.launcher3.anim.AnimatorSetBuilder
 import com.android.launcher3.anim.Interpolators
 import com.android.launcher3.touch.AbstractStateChangeTouchController
@@ -38,6 +35,8 @@ class NoAllAppsTouchController(l: Launcher) : AbstractStateChangeTouchController
     private var mPeekAnim: AnimatorSet? = null
 
     override fun canInterceptTouch(ev: MotionEvent?): Boolean {
+        if (AbstractFloatingView.getTopOpenViewWithType(mLauncher, AbstractFloatingView.TYPE_ACCESSIBLE) != null)
+            return false
         return mLauncher.isInState(LauncherState.NORMAL)
     }
 
