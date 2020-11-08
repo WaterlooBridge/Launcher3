@@ -111,7 +111,7 @@ public class DynamicIconProvider extends IconProvider {
                 Process.myUserHandle().equals(launcherActivityInfo.getUser())) {
             drawable = DynamicClock.getClock(mContext, iconDpi);
         }
-        return drawable == null ? super.getIcon(launcherActivityInfo, iconDpi, flattenDrawable) : drawable;
+        return drawable == null ? AdaptiveIconCompat.wrapNullable(super.getIcon(launcherActivityInfo, iconDpi, flattenDrawable)) : drawable;
     }
 
     @Override

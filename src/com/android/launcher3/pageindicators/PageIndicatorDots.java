@@ -227,6 +227,15 @@ public class PageIndicatorDots extends View implements PageIndicator {
         requestLayout();
     }
 
+    public void setShouldAutoHide(boolean shouldAutoHide) {
+    }
+
+    public void pauseAnimations() {
+    }
+
+    public void skipAnimationsToEnd() {
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // Add extra spacing of mDotRadius on all sides so than entry animation could be run.
