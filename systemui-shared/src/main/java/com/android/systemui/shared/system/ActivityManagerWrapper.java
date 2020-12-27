@@ -50,6 +50,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Process;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.UserHandle;
@@ -407,6 +408,20 @@ public class ActivityManagerWrapper {
         });
     }
 
+    public void removeTask(final Task task) {
+        mBackgroundExecutor.submit(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ActivityTaskManager.getService().removeTask(task.key.id);
+                    ActivityManager.getService().forceStopPackage(task.key.getPackageName(), task.key.userId);
+                } catch (RemoteException e) {
+                    Log.w(TAG, "Failed to remove task=" + task.toString(), e);
+                }
+            }
+        });
+    }
+
     /**
      * Removes all the recent tasks.
      */
@@ -415,7 +430,12 @@ public class ActivityManagerWrapper {
             @Override
             public void run() {
                 try {
+                    List<RecentTaskInfo> tasks = getRecentTasks(Integer.MAX_VALUE, Process.myUserHandle().getIdentifier());
                     ActivityTaskManager.getService().removeAllVisibleRecentTasks();
+                    for (RecentTaskInfo task : tasks) {
+                        Task.TaskKey taskKey = new Task.TaskKey(task);
+                        ActivityManager.getService().forceStopPackage(taskKey.getPackageName(), taskKey.userId);
+                    }
                 } catch (RemoteException e) {
                     Log.w(TAG, "Failed to remove all tasks", e);
                 }

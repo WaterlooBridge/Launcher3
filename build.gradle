@@ -29,11 +29,6 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
-    buildTypes {
-        debug {
-            minifyEnabled false
-        }
-    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -89,6 +84,7 @@ android {
 
     buildTypes {
         debug {
+            minifyEnabled false
             signingConfig signingConfigs.platform
         }
     }

@@ -1074,7 +1074,7 @@ public abstract class RecentsView<T extends BaseActivity> extends PagedView impl
     private void removeTask(Task task, int index, PendingAnimation.OnEndListener onEndListener,
                             boolean shouldLog) {
         if (task != null) {
-            ActivityManagerWrapper.getInstance().removeTask(task.key.id);
+            ActivityManagerWrapper.getInstance().removeTask(task);
             if (shouldLog) {
                 ComponentKey componentKey = TaskUtils.getLaunchComponentKeyForTask(task.key);
                 mActivity.getUserEventDispatcher().logTaskLaunchOrDismiss(
